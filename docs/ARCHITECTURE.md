@@ -6,24 +6,24 @@
 
 ```mermaid
 flowchart LR
-    Suite[Suite JSON\n任务与评分规则] --> CLI[CLI / API\n触发评测]
-    CLI --> Evaluator[@aep/evaluator\nrunSuite / runOne]
-    Evaluator --> Workspace[独立 Trial Workspace\nfixture 副本]
-    Evaluator --> Agent[@aep/agent\nLangGraph Coding Agent]
-    Agent --> Tools[受限工具\nread_file / write_file / run_command]
+    Suite["Suite JSON<br/>任务与评分规则"] --> CLI["CLI / API<br/>触发评测"]
+    CLI --> Evaluator["@aep/evaluator<br/>runSuite / runOne"]
+    Evaluator --> Workspace["独立 Trial Workspace<br/>fixture 副本"]
+    Evaluator --> Agent["@aep/agent<br/>LangGraph Coding Agent"]
+    Agent --> Tools["受限工具<br/>read_file / write_file / run_command"]
     Tools --> Workspace
-    Agent --> Transcript[Observable Transcript\nLLM 与工具事件]
-    Evaluator --> Scorers[评分管线\nL1 Rule / L2 Semantic / L3 Judge]
+    Agent --> Transcript["Observable Transcript<br/>LLM 与工具事件"]
+    Evaluator --> Scorers["评分管线<br/>L1 Rule / L2 Semantic / L3 Judge"]
     Transcript --> Scorers
     Workspace --> Scorers
-    Scorers --> ScoreCard[ScoreCard\npassed / totalScore / details]
-    Evaluator --> Result[TrialResult / RunSummary]
+    Scorers --> ScoreCard["ScoreCard<br/>passed / totalScore / details"]
+    Evaluator --> Result["TrialResult / RunSummary"]
     ScoreCard --> Result
-    Result --> DB[@aep/db\nPostgreSQL]
-    DB --> API[apps/api\nFastify REST]
-    API --> Web[apps/web\nNext.js Dashboard]
+    Result --> DB["@aep/db<br/>PostgreSQL"]
+    DB --> API["apps/api<br/>Fastify REST"]
+    API --> Web["apps/web<br/>Next.js Dashboard"]
 
-    Evaluator -. spans .-> Telemetry[@aep/telemetry\nOpenTelemetry SDK]
+    Evaluator -. spans .-> Telemetry["@aep/telemetry<br/>OpenTelemetry SDK"]
     Agent -. spans .-> Telemetry
     Telemetry -->|direct| Langfuse[Langfuse]
     Telemetry -->|OTLP/HTTP| Collector[OTel Collector]
@@ -93,17 +93,17 @@ sequenceDiagram
 
 ```mermaid
 flowchart TD
-    Input[Task + outcome + transcript + workspace] --> L1[L1 Rule Scorers]
-    L1 --> Required[工具/禁用工具/关键词]
-    L1 --> Files[文件存在性]
-    L1 --> Commands[验证命令退出码]
-    L1 --> Failures[Agent 命令失败次数]
-    Input --> L2{ENABLE_SEMANTIC_SCORER=1\n且存在 referenceAnswer?}
-    L2 -->|是| Embedding[Embedding cosine similarity]
-    L2 -->|否| Skip2[跳过 L2]
-    Input --> L3{task.scoring.llmJudge\n且 ENABLE_LLM_JUDGE != 0?}
-    L3 -->|是| Judge[LLM Judge JSON 评分]
-    L3 -->|否| Skip3[跳过 L3]
+    Input["Task + outcome + transcript + workspace"] --> L1["L1 Rule Scorers"]
+    L1 --> Required["工具/禁用工具/关键词"]
+    L1 --> Files["文件存在性"]
+    L1 --> Commands["验证命令退出码"]
+    L1 --> Failures["Agent 命令失败次数"]
+    Input --> L2{"ENABLE_SEMANTIC_SCORER=1<br/>且存在 referenceAnswer?"}
+    L2 -->|是| Embedding["Embedding cosine similarity"]
+    L2 -->|否| Skip2["跳过 L2"]
+    Input --> L3{"task.scoring.llmJudge<br/>且 ENABLE_LLM_JUDGE != 0?"}
+    L3 -->|是| Judge["LLM Judge JSON 评分"]
+    L3 -->|否| Skip3["跳过 L3"]
     Required --> Aggregate[aggregateScore]
     Files --> Aggregate
     Commands --> Aggregate
@@ -112,10 +112,10 @@ flowchart TD
     Judge --> Aggregate
     Skip2 --> Aggregate
     Skip3 --> Aggregate
-    Aggregate --> Hard{是否存在失败的 hardGate?}
-    Hard -->|是| Fail[Trial failed]
-    Hard -->|否| Threshold{平均分 >= 0.7 且软规则通过?}
-    Threshold -->|是| Pass[Trial passed]
+    Aggregate --> Hard{"是否存在失败的 hardGate?"}
+    Hard -->|是| Fail["Trial failed"]
+    Hard -->|否| Threshold{"平均分 >= 0.7 且软规则通过?"}
+    Threshold -->|是| Pass["Trial passed"]
     Threshold -->|否| Fail
 ```
 
@@ -125,19 +125,19 @@ flowchart TD
 
 ```mermaid
 flowchart TB
-    Root[evaluator.trial\ntraceId 写入 eval_trials.trace_id]
-    Root --> Run[agent.run]
-    Run --> LLM[llm.agent\n模型与 token usage]
-    Run --> Tool1[tool.read_file]
-    Run --> Tool2[tool.write_file]
-    Run --> Tool3[tool.run_command]
-    Root --> Score[evaluator.score]
-    SDK[packages/telemetry] --> Root
-    SDK --> Export{TELEMETRY_EXPORTER}
-    Export -->|langfuse| Direct[LangfuseSpanProcessor]
-    Export -->|otlp| OTLP[OTLPTraceExporter]
-    OTLP --> Collector[OpenTelemetry Collector]
-    Direct --> Backend[Langfuse / 其他后端]
+    Root["evaluator.trial<br/>traceId 写入 eval_trials.trace_id"]
+    Root --> Run["agent.run"]
+    Run --> LLM["llm.agent<br/>模型与 token usage"]
+    Run --> Tool1["tool.read_file"]
+    Run --> Tool2["tool.write_file"]
+    Run --> Tool3["tool.run_command"]
+    Root --> Score["evaluator.score"]
+    SDK["packages/telemetry"] --> Root
+    SDK --> Export{"TELEMETRY_EXPORTER"}
+    Export -->|langfuse| Direct["LangfuseSpanProcessor"]
+    Export -->|otlp| OTLP["OTLPTraceExporter"]
+    OTLP --> Collector["OpenTelemetry Collector"]
+    Direct --> Backend["Langfuse / 其他后端"]
     Collector --> Backend
 ```
 
