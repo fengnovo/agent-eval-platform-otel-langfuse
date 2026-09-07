@@ -33,7 +33,7 @@ PostgreSQL
 Next.js Dashboard / GitHub Actions Gate
 ```
 
-## 2. 为什么这不是“只看最终答案”的 Demo
+## 2. 不只看最终答案
 
 - 每个 Trial 有隔离 workspace，避免 K 次运行互相污染。
 - Transcript 记录可观察轨迹，不记录/依赖模型隐藏 Chain-of-Thought。
