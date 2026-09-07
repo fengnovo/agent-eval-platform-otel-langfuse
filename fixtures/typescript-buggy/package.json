@@ -1,0 +1,12 @@
+{
+  "name": "fixture-ts-buggy",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "typecheck": "tsc --noEmit",
+    "test": "node --test test.mjs"
+  },
+  "devDependencies": {
+    "typescript": "5.9.2"
+  }
+}

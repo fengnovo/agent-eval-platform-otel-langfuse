@@ -1,0 +1,36 @@
+services:
+  postgres:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: agent_eval
+    ports:
+      - "5433:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d agent_eval"]
+      interval: 5s
+      timeout: 3s
+      retries: 20
+    volumes:
+      - agent_eval_pg:/var/lib/postgresql/data
+
+  # Optional. Start with: docker compose --profile otel up -d
+  # Default config only prints received spans. Use docker-compose.otel-langfuse.yml
+  # to forward the same OTLP stream to Langfuse.
+  otel-collector:
+    profiles: ["otel"]
+    image: otel/opentelemetry-collector-contrib:0.160.0
+    command: ["--config=/etc/otelcol/debug.yaml"]
+    environment:
+      LANGFUSE_OTEL_ENDPOINT: ${LANGFUSE_OTEL_ENDPOINT:-https://cloud.langfuse.com/api/public/otel}
+      LANGFUSE_OTEL_AUTH: ${LANGFUSE_OTEL_AUTH:-}
+    volumes:
+      - ./otel/collector-debug.yaml:/etc/otelcol/debug.yaml:ro
+      - ./otel/collector-langfuse.yaml:/etc/otelcol/langfuse.yaml:ro
+    ports:
+      - "4317:4317"
+      - "4318:4318"
+
+volumes:
+  agent_eval_pg:

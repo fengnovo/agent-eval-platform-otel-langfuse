@@ -1,0 +1,26 @@
+{
+  "name": "agent-eval-platform",
+  "private": true,
+  "type": "module",
+  "packageManager": "pnpm@10.15.1",
+  "engines": { "node": ">=20" },
+  "scripts": {
+    "dev": "pnpm --parallel --filter @aep/api --filter @aep/web dev",
+    "dev:api": "pnpm --filter @aep/api dev",
+    "dev:web": "pnpm --filter @aep/web dev",
+    "eval": "tsx scripts/run-eval.ts",
+    "eval:ci": "tsx scripts/run-eval.ts --ci",
+    "telemetry:smoke": "tsx scripts/telemetry-smoke.ts",
+    "typecheck": "pnpm -r typecheck"
+  },
+  "dependencies": {
+    "@aep/db": "workspace:*",
+    "@aep/evaluator": "workspace:*",
+    "@aep/telemetry": "workspace:*",
+    "dotenv": "^17.2.0"
+  },
+  "devDependencies": {
+    "tsx": "^4.20.0",
+    "typescript": "^5.9.0"
+  }
+}

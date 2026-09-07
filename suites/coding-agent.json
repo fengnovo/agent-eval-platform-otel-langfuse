@@ -1,0 +1,23 @@
+{
+  "id": "coding-agent-regression-v1",
+  "name": "Coding Agent Regression V1",
+  "description": "Production-oriented regression suite for a LangGraph coding agent",
+  "defaultTrials": 3,
+  "tasks": [
+    {
+      "id": "fix-typescript-add",
+      "name": "Fix a TypeScript implementation bug",
+      "fixture": "fixtures/typescript-buggy",
+      "timeoutMs": 120000,
+      "input": "Fix the bug in src/math.ts. The add(a,b) function must return a numeric sum. Inspect the project, make the minimum change, and run both pnpm typecheck and pnpm test before finishing.",
+      "expected": {
+        "requiredTools": ["read_file", "write_file", "run_command"],
+        "forbiddenTools": [],
+        "requiredKeywords": ["test"],
+        "filesMustExist": ["src/math.ts"],
+        "validationCommands": ["pnpm typecheck", "pnpm test"]
+      },
+      "scoring": {"llmJudge": true, "judgeThreshold": 0.75}
+    }
+  ]
+}

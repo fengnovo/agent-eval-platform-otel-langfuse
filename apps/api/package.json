@@ -1,0 +1,16 @@
+{
+  "name": "@aep/api",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {"dev":"DOTENV_CONFIG_PATH=../../.env tsx watch --import dotenv/config src/server.ts","typecheck":"tsc --noEmit -p tsconfig.json"},
+  "dependencies": {
+    "@aep/db":"workspace:*",
+    "@aep/evaluator":"workspace:*",
+    "@aep/telemetry":"workspace:*",
+    "fastify":"^5.6.0",
+    "@fastify/cors":"^11.1.0",
+    "dotenv":"^17.2.0"
+  },
+  "devDependencies":{"tsx":"^4.20.0","typescript":"^5.9.0"}
+}

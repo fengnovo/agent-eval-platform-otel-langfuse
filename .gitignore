@@ -1,0 +1,10 @@
+node_modules
+.next
+dist
+.env
+.eval-runs
+*.log
+.DS_Store
+.code-video-venv
+code-video
+.pnpm-store
