@@ -25,13 +25,16 @@ app.get<{ Params: { id: string } }>('/runs/:id', async (req, reply) => {
 app.post<{ Body: { suite?: string; trials?: number; concurrency?: number } }>(
   '/runs',
   async (req) => {
+    const rootDir = path.resolve(import.meta.dirname, '..', '..', '..');
     const suitePath = path.resolve(
+      rootDir,
       req.body?.suite ?? 'suites/coding-agent.json',
     );
     const suite = await loadSuite(suitePath);
     const { summary } = await runSuite(suite, {
       trials: req.body?.trials,
       concurrency: req.body?.concurrency,
+      suiteDir: rootDir,
       persist: persistAdapter,
     });
     return summary;
@@ -39,7 +42,7 @@ app.post<{ Body: { suite?: string; trials?: number; concurrency?: number } }>(
 );
 // POST 会同步执行整套 Suite，适合本地参考项目；生产服务通常应改成异步 job。
 
-const port = Number(process.env.API_PORT ?? 3001);
+const port = Number(process.env.API_PORT ?? 3031); // 评测平台 API 端口
 await app.listen({ port, host: '0.0.0.0' });
 
 /** 先停止接收请求，再 flush OTel，避免进程退出时丢失最后几个 Span。 */

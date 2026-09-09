@@ -1,4 +1,4 @@
-const API = process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:3001';
+const API = process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:3031'; // 评测平台 API 地址
 const LANGFUSE_BASE = process.env.NEXT_PUBLIC_LANGFUSE_BASE_URL;
 // 详情页的数据来自 API；fetch no-store 确保刚完成的 Run 能立即看到。
 const LANGFUSE_PROJECT_ID = process.env.NEXT_PUBLIC_LANGFUSE_PROJECT_ID;
@@ -30,37 +30,37 @@ export default async function RunPage({
     <>
       <div className='top'>
         <div>
-          <a href='/'>← Runs</a>
+          <a href='/'>← Runs / 返回列表</a>
           <h1>{run.suite_name}</h1>
         </div>
         <span className='pill'>{run.status}</span>
       </div>
       <div className='grid'>
         <div className='card'>
-          <div className='muted'>Pass rate</div>
+          <div className='muted'>Pass rate / 通过率</div>
           <div className='metric'>
             {((run.summary?.passRate ?? 0) * 100).toFixed(1)}%
           </div>
         </div>
         <div className='card'>
-          <div className='muted'>Avg score</div>
+          <div className='muted'>Avg score / 平均分</div>
           <div className='metric'>
             {Number(run.summary?.avgScore ?? 0).toFixed(3)}
           </div>
         </div>
         <div className='card'>
-          <div className='muted'>P95</div>
+          <div className='muted'>P95 / P95 延迟</div>
           <div className='metric'>
             {Math.round(run.summary?.p95LatencyMs ?? 0)}ms
           </div>
         </div>
         <div className='card'>
-          <div className='muted'>Failed</div>
+          <div className='muted'>Failed / 失败数</div>
           <div className='metric'>{run.summary?.failed ?? 0}</div>
         </div>
       </div>
 
-      <h2>Trials</h2>
+      <h2>Trials / 试跑记录</h2>
       {trials.map((t: any) => {
         {
           /* 每个 Trial 展开后同时展示 OTel 关联、最终答案、原始轨迹和逐项评分。 */
@@ -77,27 +77,27 @@ export default async function RunPage({
             </summary>
             <div style={{ marginTop: 10 }}>
               <div className='muted'>OpenTelemetry traceId</div>
-              <code>{t.trace_id ?? 'telemetry disabled'}</code>
+              <code>{t.trace_id ?? '遥测已关闭'}</code>
               {traceUrl ? (
                 <>
                   {' · '}
                   <a href={traceUrl} target='_blank' rel='noreferrer'>
-                    Open in Langfuse ↗
+                    Open in Langfuse ↗ 在 Langfuse 中查看 ↗
                   </a>
                 </>
               ) : null}
             </div>
             <div className='details' style={{ marginTop: 12 }}>
               <div>
-                <h3>Outcome</h3>
+                <h3>Outcome / 执行结果</h3>
                 <div className='card'>{t.outcome || t.error}</div>
-                <h3>Transcript</h3>
+                <h3>Transcript / 轨迹</h3>
                 <div className='trace'>
                   {JSON.stringify(t.transcript, null, 2)}
                 </div>
               </div>
               <div>
-                <h3>Scorers</h3>
+                <h3>Scorers / 评分器</h3>
                 {(t.score_card?.details ?? []).map((s: any) => (
                   <div
                     className='card'

@@ -34,11 +34,15 @@ export async function loadSuite(filePath: string): Promise<EvalSuite> {
 }
 
 /** 清理并复制 fixture，保证每个 Trial 都从相同初始工程开始。 */
-async function copyFixture(fixture: string | undefined, destination: string) {
+async function copyFixture(
+  fixture: string | undefined,
+  destination: string,
+  baseDir: string,
+) {
   await fs.rm(destination, { recursive: true, force: true });
   await fs.mkdir(destination, { recursive: true });
   if (fixture)
-    await fs.cp(path.resolve(fixture), destination, { recursive: true });
+    await fs.cp(path.resolve(baseDir, fixture), destination, { recursive: true });
 }
 
 /**
@@ -109,6 +113,7 @@ async function runOne(
   task: EvalTask,
   trialIndex: number,
   rootDir: string,
+  suiteDir: string,
 ): Promise<TrialResult> {
   const trialId = crypto.randomUUID();
   const workspace = path.join(rootDir, runId, task.id, String(trialIndex));
@@ -137,7 +142,7 @@ async function runOne(
         trial_index: trialIndex,
       });
 
-      await copyFixture(task.fixture, workspace);
+      await copyFixture(task.fixture, workspace, suiteDir);
       const transcript: TraceEvent[] = [];
       const started = Date.now();
       let outcome = '';
@@ -240,6 +245,7 @@ export async function runSuite(
     trials?: number;
     concurrency?: number;
     runRoot?: string;
+    suiteDir?: string;
     persist?: PersistAdapter;
   },
 ) {
@@ -248,7 +254,9 @@ export async function runSuite(
   const startedAt = new Date();
   const trialsPerTask = options?.trials ?? suite.defaultTrials;
   const concurrency = Math.max(1, options?.concurrency ?? 2);
-  const root = path.resolve(options?.runRoot ?? '.eval-runs');
+  // suiteDir 作为 fixture 和 runRoot 的解析基准，保证 CLI 和 API 行为一致。
+  const suiteDir = options?.suiteDir ?? process.cwd();
+  const root = path.resolve(suiteDir, options?.runRoot ?? '.eval-runs');
   await options?.persist?.saveRunStart?.(runId, suite);
 
   const jobs = suite.tasks.flatMap((task) =>
@@ -263,7 +271,7 @@ export async function runSuite(
         const current = cursor++;
         const job = jobs[current];
         if (!job) break;
-        const result = await runOne(runId, job.task, job.i, root);
+        const result = await runOne(runId, job.task, job.i, root, suiteDir);
         results.push(result);
         await options?.persist?.saveTrial?.(result);
       }

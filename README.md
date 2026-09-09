@@ -66,8 +66,8 @@ pnpm eval
 pnpm dev
 ```
 
-- Web: http://localhost:3000
-- API: http://localhost:3001
+- Web: http://localhost:3030
+- API: http://localhost:3031
 
 ## 4. 评估数据集
 
